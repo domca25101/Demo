@@ -1,0 +1,39 @@
+# ./docker-compose.yml
+version: "3.3"
+
+services:
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    container_name: coffeeShop-rabbitmq
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "test"
+      RABBITMQ_DEFAULT_PASS: "test"
+      RABBITMQ_DEFAULT_VHOST: "rabbitmq_test"
+    volumes:
+      - "./rmq:/var/lib/rabbitmq/mnesia/"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+   
+      
+  mongodb:
+    image: mongo:latest
+    container_name: coffeeShop-mongodb
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    # volumes:
+    #   - ../db:/data/db:cached
+    command: mongod --logpath=/dev/null --quiet
+    ports:
+      - "27017:27017"
+    networks:
+      - bridge   
+
+networks:
+  bridge:
+    driver: bridge
+ 
+volumes:
+  rabbitmq-01-data: 
