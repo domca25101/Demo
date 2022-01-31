@@ -6,9 +6,9 @@ namespace CoffeeShop.API.GraphQL.Subscriptions;
 
 public class ReservationSubscriptionService
 {
-    private readonly ISubject<Reservation> _addReservationStream = new ReplaySubject<Reservation>(1);
-    private readonly ISubject<Reservation> _updateReservationStream = new ReplaySubject<Reservation>(1);
-    private readonly ISubject<Reservation> _removeReservationStream = new ReplaySubject<Reservation>(1);
+    private readonly ISubject<Reservation> _addReservationStream = new Subject<Reservation>();
+    private readonly ISubject<Reservation> _updateReservationStream = new Subject<Reservation>();
+    private readonly ISubject<Reservation> _removeReservationStream = new ReplaySubject<Reservation>();
 
     public Reservation ReservationAdded(Reservation reservation)
     {

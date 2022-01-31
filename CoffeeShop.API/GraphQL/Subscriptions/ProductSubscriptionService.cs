@@ -6,9 +6,9 @@ namespace CoffeeShop.API.GraphQL.Subscriptions;
 
 public class ProductSubscriptionService
 {
-    private readonly ISubject<Product> _addProductStream = new ReplaySubject<Product>(1);
-    private readonly ISubject<Product> _updateProductStream = new ReplaySubject<Product>(1);
-    private readonly ISubject<Product> _removeProductStream = new ReplaySubject<Product>(1);
+    private readonly ISubject<Product> _addProductStream = new Subject<Product>();
+    private readonly ISubject<Product> _updateProductStream = new Subject<Product>();
+    private readonly ISubject<Product> _removeProductStream = new Subject<Product>();
 
     public Product ProductAdded(Product product)
     {

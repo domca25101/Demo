@@ -18,21 +18,10 @@ public class ProductController : ControllerBase
         _publisher = publisher;
     }
 
-     [HttpGet]
+    [HttpGet]
     public async Task<IActionResult> Get()
     {
         var products = await _client.GetProducts();
-          try
-        {
-            foreach (var product in products)
-            {
-                await _publisher.PublishProduct(product, "Publish");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"--> Could not send: {ex.Message}");
-        }
         return Ok(products);
     }
 
@@ -47,14 +36,6 @@ public class ProductController : ControllerBase
     public async Task<IActionResult> Add(ProductInput product)
     {
         var productObj = await _client.AddProduct(product);
-        try
-        {
-            await _publisher.PublishProduct(productObj, "Add");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"--> Could not send: {ex.Message}");
-        }
         return Ok(productObj);
     }
 
@@ -62,29 +43,13 @@ public class ProductController : ControllerBase
     public async Task<IActionResult> Update(int id, ProductInput product)
     {
         var productObj = await _client.UpdateProduct(id, product);
-        try
-        {
-            await _publisher.PublishProduct(productObj, "Update");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"--> Could not send: {ex.Message}");
-        }
         return Ok(productObj);
     }
 
     [HttpDelete]
     public async Task<IActionResult> Delete(int id)
     {
-        var str = await _client.DeleteProduct(id);
-        try
-        {
-            await _publisher.Delete(id, "Product");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"--> Could not send: {ex.Message}");
-        }
-        return Ok(str);
+        var product = await _client.DeleteProduct(id);
+        return Ok(product);
     }
 }

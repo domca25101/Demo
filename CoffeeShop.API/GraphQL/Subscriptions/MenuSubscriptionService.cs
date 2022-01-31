@@ -6,9 +6,9 @@ namespace CoffeeShop.API.GraphQL.Subscriptions;
 
 public class MenuSubscriptionService
 {
-    private readonly ISubject<Menu> _addMenuStream = new ReplaySubject<Menu>(1);
-    private readonly ISubject<Menu> _updateMenuStream = new ReplaySubject<Menu>(1);
-    private readonly ISubject<Menu> _removeMenuStream = new ReplaySubject<Menu>(1);
+    private readonly ISubject<Menu> _addMenuStream = new Subject<Menu>();
+    private readonly ISubject<Menu> _updateMenuStream = new Subject<Menu>();
+    private readonly ISubject<Menu> _removeMenuStream = new Subject<Menu>();
 
     public Menu MenuAdded(Menu menu)
     {

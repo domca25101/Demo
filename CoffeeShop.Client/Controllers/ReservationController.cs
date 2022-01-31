@@ -18,21 +18,10 @@ public class ReservationController : ControllerBase
         _publisher = publisher;
     }
 
-     [HttpGet]
+    [HttpGet]
     public async Task<IActionResult> Get()
     {
         var reservations = await _client.GetReservations();
-         try
-        {
-            foreach (var reservation in reservations)
-            {
-                await _publisher.PublishReservation(reservation, "Publish");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"--> Could not send: {ex.Message}");
-        }
         return Ok(reservations);
     }
 
@@ -47,14 +36,6 @@ public class ReservationController : ControllerBase
     public async Task<IActionResult> Add(ReservationInput reservation)
     {
         var reservationObj = await _client.AddReservation(reservation);
-         try
-        {
-            await _publisher.PublishReservation(reservationObj, "Add");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"--> Could not send: {ex.Message}");
-        }
         return Ok(reservationObj);
     }
 
@@ -62,29 +43,13 @@ public class ReservationController : ControllerBase
     public async Task<IActionResult> Update(int id, ReservationInput reservation)
     {
         var reservationObj = await _client.UpdateReservation(id, reservation);
-         try
-        {
-            await _publisher.PublishReservation(reservationObj, "Update");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"--> Could not send: {ex.Message}");
-        }
         return Ok(reservationObj);
     }
 
     [HttpDelete]
     public async Task<IActionResult> Delete(int id)
     {
-        var str = await _client.DeleteReservation(id);
-         try
-        {
-            await _publisher.Delete(id, "Reservation");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"--> Could not send: {ex.Message}");
-        }
-        return Ok(str);
+        var reservation = await _client.DeleteReservation(id);
+        return Ok(reservation);
     }
 }

@@ -16,16 +16,7 @@ public class MessagePublisher : IMessagePublisher
         _mapper = mapper;
     }
 
-    public async Task Delete(int id, string entityType)
-    {
-        var message = new DeleteMessage();
-        message.Id = id;
-        message.Event = "Delete";
-        message.EntityType = entityType;
-        await _bus.SendReceive.SendAsync("CoffeeShop.Data", message);
-        Console.WriteLine("--> Delete Message published!");
-    }
-
+    //Send Menu Message with specified event to defined Queue
     public async Task PublishMenu(Menu menu, string eventType)
     {
         var message = _mapper.Map<MenuMessage>(menu);
@@ -34,6 +25,7 @@ public class MessagePublisher : IMessagePublisher
         Console.WriteLine("--> Menu Message published!");
     }
 
+    //Send Product Message with specified event to defined Queue
     public async Task PublishProduct(Product product, string eventType)
     {
         var message = _mapper.Map<ProductMessage>(product);
@@ -42,6 +34,7 @@ public class MessagePublisher : IMessagePublisher
         Console.WriteLine("--> Product Message published!");
     }
 
+    //Send Reservation Message with specified event to define Queue
     public async Task PublishReservation(Reservation reservation, string eventType)
     {
         var message = _mapper.Map<ReservationMessage>(reservation);

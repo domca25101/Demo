@@ -1,4 +1,5 @@
 using CoffeeShop.Client.Clients;
+using CoffeeShop.Client.GraphQLSubscription;
 using CoffeeShop.Client.RabbitMQ;
 using EasyNetQ;
 using GraphQL.Client.Abstractions;
@@ -16,14 +17,13 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-builder.Services.AddScoped<IGraphQLClient>(p => new GraphQLHttpClient(builder.Configuration.GetConnectionString("CoffeeShopApi"), new NewtonsoftJsonSerializer()));
-builder.Services.AddScoped<GraphQLClient>();
-builder.Services.AddScoped<SubscriptionClient>();
-
 var bus = RabbitHutch.CreateBus(builder.Configuration.GetConnectionString("RabbitMQ"), registerServices: s => s.Register<ITypeNameSerializer, TypeNameSerializer>());
 builder.Services.AddSingleton(bus);
-
 builder.Services.AddSingleton<IMessagePublisher, MessagePublisher>();
+
+builder.Services.AddSingleton<IGraphQLClient>(p => new GraphQLHttpClient(builder.Configuration.GetConnectionString("CoffeeShopApi"), new NewtonsoftJsonSerializer()));
+builder.Services.AddSingleton<GraphQLClient>();
+builder.Services.AddSingleton<SubscriptionHandler>();
 
 var app = builder.Build();
 
@@ -40,4 +40,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+var subscriptionHandler = app.Services.GetService<SubscriptionHandler>().SubscribeAll();
+
 app.Run();
+
+subscriptionHandler.Dispose();

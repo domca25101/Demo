@@ -15,6 +15,7 @@ public class GraphQLClient
         _client = client;
     }
 
+    //Query and Mutation requests for menus
     #region  Menu
     public async Task<IEnumerable<Menu>> GetMenus()
     {
@@ -22,20 +23,18 @@ public class GraphQLClient
         {
             Query = @"
             query{
-                menuQuery{
-                    menus{
+                menus{
+                    id
+                    name
+                    imageUrl
+                    products{
                         id
                         name
+                        description
+                        price
                         imageUrl
-                        products{
-                            id
-                            name
-                            description
-                            price
-                            imageUrl
-                            menuId
-                        }    
-                    }
+                        menuId
+                    }    
                 }
             }"
         };
@@ -49,21 +48,19 @@ public class GraphQLClient
         {
             Query = @"
             query($id: Int){
-                menuQuery{
-                    menu(id: $id){
+                menu(id: $id){
+                    id
+                    name
+                    imageUrl
+                    products{
                         id
                         name
+                        description
+                        price
                         imageUrl
-                        products{
-                            id
-                            name
-                            description
-                            price
-                            imageUrl
-                            menuId
-                        }
+                        menuId
                     }
-                }    
+                }   
             }",
             Variables = new { id = id }
         };
@@ -78,13 +75,11 @@ public class GraphQLClient
             Query = @"
             mutation($menu: MenuInputType)
             {
-                menuMutation{
-                    addMenu(menu: $menu)
-                    {
-                        id
-                        name
-                        imageUrl
-                    }
+                addMenu(menu: $menu)
+                {
+                    id
+                    name
+                    imageUrl
                 }
             }",
             Variables = new { menu = menu }
@@ -99,12 +94,10 @@ public class GraphQLClient
         {
             Query = @"
             mutation($id: Int, $menu: MenuInputType){
-                menuMutation{
-                    updateMenu(id: $id, menu :$menu){
-                        id
-                        name
-                        imageUrl
-                    }
+                updateMenu(id: $id, menu :$menu){
+                    id
+                    name
+                    imageUrl
                 }
             }",
             Variables = new { id = id, menu = menu }
@@ -119,10 +112,8 @@ public class GraphQLClient
         {
             Query = @"
             mutation($id : Int){
-                menuMutation{
-                    removeMenu(id : $id){
-                        id
-                    }
+                removeMenu(id : $id){
+                    id
                 }
             }",
             Variables = new { id = id }
@@ -132,6 +123,7 @@ public class GraphQLClient
     }
     #endregion
 
+    //Query and Mutation requests for products
     #region Product
     public async Task<IEnumerable<Product>> GetProducts()
     {
@@ -139,15 +131,16 @@ public class GraphQLClient
         {
             Query = @"
             query{
-                productQuery{
-                    products{
-                        id
+                products{
+                    id
+                    name
+                    imageUrl
+                    description
+                    price
+                    menuId
+                    menu{ 
                         name
                         imageUrl
-                        description
-                        price
-                        menuId
-                        menu
                     }
                 }
             }"
@@ -162,19 +155,18 @@ public class GraphQLClient
         {
             Query = @"
             query($menuId: Int){
-                productQuery{
-                    productsForMenu(menuId: $menuId){
-                        id
+                productsForMenu(menuId: $menuId){
+                    id
+                    name
+                    imageUrl
+                    description
+                    price
+                    menuId
+                    menu{
                         name
                         imageUrl
-                        description
-                        price
-                        menuId
-                        menu{
-                            name
-                        }
                     }
-                }    
+                }   
             }",
             Variables = new { menuId = menuId }
         };
@@ -188,15 +180,13 @@ public class GraphQLClient
         {
             Query = @"
             mutation($product: ProductInputType){
-                productMutation{
-                    addProduct(product: $product){
-                        id
-                        name
-                        description
-                        price
-                        imageUrl
-                        menuId
-                    }
+                addProduct(product: $product){
+                    id
+                    name
+                    description
+                    price
+                    imageUrl
+                    menuId
                 }
             }",
             Variables = new { product = product }
@@ -211,15 +201,13 @@ public class GraphQLClient
         {
             Query = @"
             mutation($id: Int, $product: ProductInputType){
-                productMutation{
-                    updateProduct(id: $id, product :$product){
-                        id
-                        name
-                        description
-                        price
-                        imageUrl
-                        menuId
-                    }
+                updateProduct(id: $id, product :$product){
+                    id
+                    name
+                    description
+                    price
+                    imageUrl
+                    menuId
                 }
             }",
             Variables = new { id = id, product = product }
@@ -234,11 +222,9 @@ public class GraphQLClient
         {
             Query = @"
             mutation($id : Int){
-                productMutation{
-                    removeProduct(id : $id){
-                        id
-                    }
-                }   
+                removeProduct(id : $id){
+                    id
+                }  
             }",
             Variables = new { id = id }
         };
@@ -247,6 +233,7 @@ public class GraphQLClient
     }
     #endregion
 
+    //Query and Mutation requests for reservations
     #region Reservation
     public async Task<IEnumerable<Reservation>> GetReservations()
     {
@@ -254,16 +241,14 @@ public class GraphQLClient
         {
             Query = @"
             query{
-                reservationQuery{
-                    reservations{
-                        id
-                        name
-                        phone
-                        email
-                        totalPeople
-                        date
-                        time
-                    }
+                reservations{
+                    id
+                    name
+                    phone
+                    email
+                    totalPeople
+                    date
+                    time
                 }
             }"
         };
@@ -277,17 +262,15 @@ public class GraphQLClient
         {
             Query = @"
             query($id: Int){
-                reservationQuery{
-                    reservation(id: $id){
-                        id
-                        name
-                        phone
-                        email
-                        totalPeople
-                        date
-                        time
-                    } 
-                }    
+                reservation(id: $id){
+                    id
+                    name
+                    phone
+                    email
+                    totalPeople
+                    date
+                    time
+                }   
             }",
             Variables = new { id = id }
         };
@@ -300,19 +283,16 @@ public class GraphQLClient
         var request = new GraphQLHttpRequest
         {
             Query = @"
-            mutation($reservation: ReservationInputType)
-            {
-                reservationMutation{
-                    addReservation(reservation: $reservation)
-                    {
-                        id
-                        name
-                        phone
-                        email
-                        totalPeople
-                        date
-                        time 
-                    }
+            mutation($reservation: ReservationInputType){
+                addReservation(reservation: $reservation)
+                {
+                    id
+                    name
+                    phone
+                    email
+                    totalPeople
+                    date
+                    time 
                 }
             }",
             Variables = new { reservation = reservation }
@@ -327,16 +307,14 @@ public class GraphQLClient
         {
             Query = @"
             mutation($id: Int, $reservation: ReservationInputType){
-                reservationMutation{
-                    updateReservation(id: $id, reservation :$reservation){
-                        id
-                        name
-                        phone
-                        email
-                        totalPeople
-                        date
-                        time
-                    }
+                updateReservation(id: $id, reservation :$reservation){
+                    id
+                    name
+                    phone
+                    email
+                    totalPeople
+                    date
+                    time
                 }
             }",
             Variables = new { id = id, reservation = reservation }
@@ -351,10 +329,8 @@ public class GraphQLClient
         {
             Query = @"
             mutation($id : Int){
-                reservationMutation{
-                    removeReservation(id : $id){
-                        id
-                    }
+                removeReservation(id : $id){
+                    id
                 }
             }",
             Variables = new { id = id }

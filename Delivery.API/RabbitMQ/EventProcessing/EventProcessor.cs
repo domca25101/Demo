@@ -16,14 +16,15 @@ public class EventProcessor : IEventProcessor
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Processes message based on Event written inside message
+    /// </summary>
+    /// <param name="message"></param>
     public void ProcessEvent(Message message)
     {
         var eventType = DetermineEvent(message);
         switch (eventType)
         {
-            case EventType.Publish:
-                Publish(message);
-                break;
             case EventType.Add:
                 Add(message);
                 break;
@@ -38,15 +39,17 @@ public class EventProcessor : IEventProcessor
         }
     }
 
+    /// <summary>
+    /// Determines Type of the event
+    /// </summary>
+    /// <param name="platformPublishedDto"></param>
+    /// <returns></returns>
     private EventType DetermineEvent(Message message)
     {
         Console.WriteLine("--> Determining Event");
         var eventType = _mapper.Map<GenericEvent>(message);
         switch (eventType.Event)
         {
-            case "Publish":
-                Console.WriteLine("--> Publish Event Determined");
-                return EventType.Publish;
             case "Add":
                 Console.WriteLine("--> Add Event Determined");
                 return EventType.Add;
@@ -62,67 +65,11 @@ public class EventProcessor : IEventProcessor
         }
     }
 
-    private async void Publish(Message message)
-    {
-        using (var scope = _scopeFactory.CreateScope())
-        {
-            if (message is MenuMessage)
-            {
-                try
-                {
-                    var menuRepo = scope.ServiceProvider.GetRequiredService<MenuService>();
-                    if (await menuRepo.MenuExist(message.Id))
-                    {
-                        Console.WriteLine("--> Menu already exists!");
-                        return;
-                    }
-                    var menu = _mapper.Map<Menu>(message);
-                    await menuRepo.CreateAsync(menu);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"--> Could not add to DB {ex.Message}");
-                }
-            }
-            else if (message is ProductMessage)
-            {
-                try
-                {
-                    var productRepo = scope.ServiceProvider.GetRequiredService<ProductService>();
-                    if (await productRepo.ProductExist(message.Id))
-                    {
-                        Console.WriteLine("--> Product already exists!");
-                        return;
-                    }
-                    var product = _mapper.Map<Product>(message);
-                    await productRepo.CreateAsync(product);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"--> Could not add to DB {ex.Message}");
-                }
-            }
-             else
-            {
-                try
-                {
-                    var reservationRepo = scope.ServiceProvider.GetRequiredService<ReservationService>();
-                    if (await reservationRepo.ReservationExist(message.Id))
-                    {
-                        Console.WriteLine("--> Reservation already exists!");
-                        return;
-                    }
-                    var reservation = _mapper.Map<Reservation>(message);
-                    await reservationRepo.CreateAsync(reservation);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"--> Could not add to DB {ex.Message}");
-                }
-            }
-        }
-    }
 
+    /// <summary>
+    /// Adds object to DB based on message type
+    /// </summary>
+    /// <param name="message">contains menu, product or reservation object with specified event</param>
     private async void Add(Message message)
     {
         using (var scope = _scopeFactory.CreateScope())
@@ -131,9 +78,9 @@ public class EventProcessor : IEventProcessor
             {
                 try
                 {
-                    var menuRepo = scope.ServiceProvider.GetRequiredService<MenuService>();
+                    var menuRepository = scope.ServiceProvider.GetRequiredService<MenuService>();
                     var menu = _mapper.Map<Menu>(message);
-                    await menuRepo.CreateAsync(menu);
+                    await menuRepository.CreateAsync(menu);
                 }
                 catch (Exception ex)
                 {
@@ -144,9 +91,9 @@ public class EventProcessor : IEventProcessor
             {
                 try
                 {
-                    var productRepo = scope.ServiceProvider.GetRequiredService<ProductService>();
+                    var productRepository = scope.ServiceProvider.GetRequiredService<ProductService>();
                     var product = _mapper.Map<Product>(message);
-                    await productRepo.CreateAsync(product);
+                    await productRepository.CreateAsync(product);
                 }
                 catch (Exception ex)
                 {
@@ -157,9 +104,9 @@ public class EventProcessor : IEventProcessor
             {
                 try
                 {
-                    var reservationRepo = scope.ServiceProvider.GetRequiredService<ReservationService>();
+                    var reservationRepository = scope.ServiceProvider.GetRequiredService<ReservationService>();
                     var reservation = _mapper.Map<Reservation>(message);
-                    await reservationRepo.CreateAsync(reservation);
+                    await reservationRepository.CreateAsync(reservation);
                 }
                 catch (Exception ex)
                 {
@@ -169,6 +116,10 @@ public class EventProcessor : IEventProcessor
         }
     }
 
+    /// <summary>
+    /// Updates record in DB based on message type
+    /// </summary>
+    /// <param name="message">contains menu, product or reservation object with specified event</param>
     private async void Update(Message message)
     {
         using (var scope = _scopeFactory.CreateScope())
@@ -177,9 +128,9 @@ public class EventProcessor : IEventProcessor
             {
                 try
                 {
-                    var menuRepo = scope.ServiceProvider.GetRequiredService<MenuService>();
+                    var menuRepository = scope.ServiceProvider.GetRequiredService<MenuService>();
                     var menu = _mapper.Map<Menu>(message);
-                    await menuRepo.UpdateAsync(menu.Id, menu);
+                    await menuRepository.UpdateAsync(menu.Id, menu);
                 }
                 catch (Exception ex)
                 {
@@ -190,9 +141,9 @@ public class EventProcessor : IEventProcessor
             {
                 try
                 {
-                    var productRepo = scope.ServiceProvider.GetRequiredService<ProductService>();
+                    var productRepository = scope.ServiceProvider.GetRequiredService<ProductService>();
                     var product = _mapper.Map<Product>(message);
-                    await productRepo.UpdateAsync(product.Id, product);
+                    await productRepository.UpdateAsync(product.Id, product);
                 }
                 catch (Exception ex)
                 {
@@ -203,9 +154,9 @@ public class EventProcessor : IEventProcessor
             {
                 try
                 {
-                    var reservationRepo = scope.ServiceProvider.GetRequiredService<ReservationService>();
+                    var reservationRepository = scope.ServiceProvider.GetRequiredService<ReservationService>();
                     var reservation = _mapper.Map<Reservation>(message);
-                    await reservationRepo.UpdateAsync(reservation.Id, reservation);
+                    await reservationRepository.UpdateAsync(reservation.Id, reservation);
                 }
                 catch (Exception ex)
                 {
@@ -215,49 +166,55 @@ public class EventProcessor : IEventProcessor
         }
     }
 
+    /// <summary>
+    /// Removes record from DB based on message type
+    /// </summary>
+    /// <param name="message"></param>
+    /// <returns>contains menu, product or reservation object with specified event</returns>
     private async void Delete(Message message)
     {
         using (var scope = _scopeFactory.CreateScope())
         {
-            var msg = (DeleteMessage)message;
-            if (msg.EntityType == "Menu")
+            if (message is MenuMessage)
             {
                 try
                 {
-                    var menuRepo = scope.ServiceProvider.GetRequiredService<MenuService>();
-                    await menuRepo.RemoveAsync(msg.Id);
+                    var menuRepository = scope.ServiceProvider.GetRequiredService<MenuService>();
+                    var menu = _mapper.Map<Menu>(message);
+                    await menuRepository.RemoveAsync(menu.Id);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"--> Could not delete record from DB {ex.Message}");
+                    Console.WriteLine($"--> Could not remove record from DB {ex.Message}");
                 }
             }
-            else if (msg.EntityType == "Product")
+            else if (message is ProductMessage)
             {
                 try
                 {
-                    var productRepo = scope.ServiceProvider.GetRequiredService<ProductService>();
-                    await productRepo.RemoveAsync(msg.Id);
+                    var productRepository = scope.ServiceProvider.GetRequiredService<ProductService>();
+                    var product = _mapper.Map<Product>(message);
+                    await productRepository.RemoveAsync(product.Id);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"--> Could not delete record from DB {ex.Message}");
+                    Console.WriteLine($"--> Could not remove record from DB {ex.Message}");
                 }
             }
             else
             {
                 try
                 {
-                    var reservationRepo = scope.ServiceProvider.GetRequiredService<ReservationService>();
-                    await reservationRepo.RemoveAsync(msg.Id);
+                    var reservationRepository = scope.ServiceProvider.GetRequiredService<ReservationService>();
+                    var reservation = _mapper.Map<Reservation>(message);
+                    await reservationRepository.RemoveAsync(reservation.Id);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"--> Could not delete record from DB {ex.Message}");
+                    Console.WriteLine($"--> Could not remove record from DB {ex.Message}");
                 }
             }
         }
-
     }
 }
 

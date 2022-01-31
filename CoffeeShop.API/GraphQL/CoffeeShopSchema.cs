@@ -1,5 +1,3 @@
-using CoffeeShop.API.GraphQL.Mutations;
-using CoffeeShop.API.GraphQL.Queries;
 using CoffeeShop.API.GraphQL.Subscriptions;
 using GraphQL.Types;
 
