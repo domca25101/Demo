@@ -454,13 +454,26 @@ $RECYCLE.BIN/
 !.vscode/launch.json
 !.vscode/extensions.json
 
-CoffeeShop.API/.vscode/
+
+CoffeeShop.API/.vscode/*
+!CoffeeShop.API/.vscode/settings.json
+!CoffeeShop.API/.vscode/tasks.json
+!CoffeeShop.API/.vscode/launch.json
+!CoffeeShop.API/.vscode/extensions.json
 
 
-CoffeeShop.Client/.vscode/
+CoffeeShop.Client/.vscode/*
+!CoffeeShop.Client/.vscode/settings.json
+!CoffeeShop.Client/.vscode/tasks.json
+!CoffeeShop.Client/.vscode/launch.json
+!CoffeeShop.Client/.vscode/extensions.json
 
 
 Delivery.API/.vscode/
+!Delivery.API/.vscode/settings.json
+!Delivery.API/.vscode/tasks.json
+!Delivery.API/.vscode/launch.json
+!Delivery.API/.vscode/extensions.json
 
 rmq/
 
