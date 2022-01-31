@@ -33,6 +33,6 @@ public class ProductService
     public async Task RemoveAsync(int id) =>
         await _productCollection.DeleteOneAsync(x => x.Id == id);
 
-    public bool ProductExist(int id) =>
-        _productCollection.Find(x => x.Id == id).FirstOrDefault() != null ? true : false;
+    public async Task<bool> ProductExist(int id) =>
+        await _productCollection.Find(x => x.Id == id).AnyAsync();
 }

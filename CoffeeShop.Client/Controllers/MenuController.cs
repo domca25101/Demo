@@ -11,11 +11,13 @@ public class MenuController : ControllerBase
 {
     private readonly GraphQLClient _client;
     private readonly IMessagePublisher _publisher;
+    private readonly SubscriptionClient _sClient;
 
-    public MenuController(GraphQLClient client, IMessagePublisher publisher)
+    public MenuController(GraphQLClient client, IMessagePublisher publisher, SubscriptionClient sClient)
     {
         _client = client;
         _publisher = publisher;
+        _sClient = sClient;
     }
 
     [HttpGet]

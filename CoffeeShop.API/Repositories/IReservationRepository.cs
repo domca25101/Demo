@@ -8,5 +8,5 @@ public interface IReservationRepository
     Task<Reservation> GetReservationById(int id);
     Task<Reservation> AddReservation(Reservation reservation);
     Task<Reservation> UpdateReservation(int id, Reservation reservation);
-    Task<string> RemoveReservation(int id);
+    Task<Reservation> RemoveReservation(int id);
 }

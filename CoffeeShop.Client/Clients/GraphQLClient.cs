@@ -22,15 +22,19 @@ public class GraphQLClient
         {
             Query = @"
             query{
-                menus{
-                    id
-                    name
-                    imageUrl
-                    products{
+                menuQuery{
+                    menus{
                         id
                         name
-                        description
-                        price
+                        imageUrl
+                        products{
+                            id
+                            name
+                            description
+                            price
+                            imageUrl
+                            menuId
+                        }    
                     }
                 }
             }"
@@ -45,10 +49,20 @@ public class GraphQLClient
         {
             Query = @"
             query($id: Int){
-                menu(id: $id){
-                    id
-                    name
-                    imageUrl  
+                menuQuery{
+                    menu(id: $id){
+                        id
+                        name
+                        imageUrl
+                        products{
+                            id
+                            name
+                            description
+                            price
+                            imageUrl
+                            menuId
+                        }
+                    }
                 }    
             }",
             Variables = new { id = id }
@@ -64,11 +78,13 @@ public class GraphQLClient
             Query = @"
             mutation($menu: MenuInputType)
             {
-                addMenu(menu: $menu)
-                {
-                    id
-                    name
-                    imageUrl
+                menuMutation{
+                    addMenu(menu: $menu)
+                    {
+                        id
+                        name
+                        imageUrl
+                    }
                 }
             }",
             Variables = new { menu = menu }
@@ -83,10 +99,12 @@ public class GraphQLClient
         {
             Query = @"
             mutation($id: Int, $menu: MenuInputType){
-                updateMenu(id: $id, menu :$menu){
-                    id
-                    name
-                    imageUrl
+                menuMutation{
+                    updateMenu(id: $id, menu :$menu){
+                        id
+                        name
+                        imageUrl
+                    }
                 }
             }",
             Variables = new { id = id, menu = menu }
@@ -95,17 +113,21 @@ public class GraphQLClient
         return response.Data.updateMenu;
     }
 
-    public async Task<string> DeleteMenu(int id)
+    public async Task<Menu> DeleteMenu(int id)
     {
         var request = new GraphQLHttpRequest
         {
             Query = @"
             mutation($id : Int){
-                removeMenu(id : $id)
+                menuMutation{
+                    removeMenu(id : $id){
+                        id
+                    }
+                }
             }",
             Variables = new { id = id }
         };
-        var response = await _client.SendMutationAsync(request, () => new { removeMenu = "" });
+        var response = await _client.SendMutationAsync(request, () => new { removeMenu = new Menu() });
         return response.Data.removeMenu;
     }
     #endregion
@@ -117,13 +139,16 @@ public class GraphQLClient
         {
             Query = @"
             query{
-                products{
-                    id
-                    name
-                    imageUrl
-                    description
-                    price
-                    menuId
+                productQuery{
+                    products{
+                        id
+                        name
+                        imageUrl
+                        description
+                        price
+                        menuId
+                        menu
+                    }
                 }
             }"
         };
@@ -137,13 +162,18 @@ public class GraphQLClient
         {
             Query = @"
             query($menuId: Int){
-                productsForMenu(menuId: $menuId){
-                    id
-                    name
-                    imageUrl
-                    description
-                    price
-                    menuId 
+                productQuery{
+                    productsForMenu(menuId: $menuId){
+                        id
+                        name
+                        imageUrl
+                        description
+                        price
+                        menuId
+                        menu{
+                            name
+                        }
+                    }
                 }    
             }",
             Variables = new { menuId = menuId }
@@ -157,16 +187,16 @@ public class GraphQLClient
         var request = new GraphQLHttpRequest
         {
             Query = @"
-            mutation($product: ProductInputType)
-            {
-                addProduct(product: $product)
-                {
-                    id
-                    name
-                    description
-                    price
-                    imageUrl
-                    menuId
+            mutation($product: ProductInputType){
+                productMutation{
+                    addProduct(product: $product){
+                        id
+                        name
+                        description
+                        price
+                        imageUrl
+                        menuId
+                    }
                 }
             }",
             Variables = new { product = product }
@@ -181,13 +211,15 @@ public class GraphQLClient
         {
             Query = @"
             mutation($id: Int, $product: ProductInputType){
-                updateProduct(id: $id, product :$product){
-                    id
-                    name
-                    description
-                    price
-                    imageUrl
-                    menuId
+                productMutation{
+                    updateProduct(id: $id, product :$product){
+                        id
+                        name
+                        description
+                        price
+                        imageUrl
+                        menuId
+                    }
                 }
             }",
             Variables = new { id = id, product = product }
@@ -196,17 +228,21 @@ public class GraphQLClient
         return response.Data.updateProduct;
     }
 
-    public async Task<string> DeleteProduct(int id)
+    public async Task<Product> DeleteProduct(int id)
     {
         var request = new GraphQLHttpRequest
         {
             Query = @"
             mutation($id : Int){
-                removeProduct(id : $id)
+                productMutation{
+                    removeProduct(id : $id){
+                        id
+                    }
+                }   
             }",
             Variables = new { id = id }
         };
-        var response = await _client.SendMutationAsync(request, () => new { removeProduct = "" });
+        var response = await _client.SendMutationAsync(request, () => new { removeProduct = new Product() });
         return response.Data.removeProduct;
     }
     #endregion
@@ -218,14 +254,16 @@ public class GraphQLClient
         {
             Query = @"
             query{
-                reservations{
-                    id
-                    name
-                    phone
-                    email
-                    totalPeople
-                    date
-                    time
+                reservationQuery{
+                    reservations{
+                        id
+                        name
+                        phone
+                        email
+                        totalPeople
+                        date
+                        time
+                    }
                 }
             }"
         };
@@ -239,14 +277,16 @@ public class GraphQLClient
         {
             Query = @"
             query($id: Int){
-                reservation(id: $id){
-                    id
-                    name
-                    phone
-                    email
-                    totalPeople
-                    date
-                    time 
+                reservationQuery{
+                    reservation(id: $id){
+                        id
+                        name
+                        phone
+                        email
+                        totalPeople
+                        date
+                        time
+                    } 
                 }    
             }",
             Variables = new { id = id }
@@ -262,15 +302,17 @@ public class GraphQLClient
             Query = @"
             mutation($reservation: ReservationInputType)
             {
-                addReservation(reservation: $reservation)
-                {
-                   id
-                    name
-                    phone
-                    email
-                    totalPeople
-                    date
-                    time 
+                reservationMutation{
+                    addReservation(reservation: $reservation)
+                    {
+                        id
+                        name
+                        phone
+                        email
+                        totalPeople
+                        date
+                        time 
+                    }
                 }
             }",
             Variables = new { reservation = reservation }
@@ -285,14 +327,16 @@ public class GraphQLClient
         {
             Query = @"
             mutation($id: Int, $reservation: ReservationInputType){
-                updateReservation(id: $id, reservation :$reservation){
-                    id
-                    name
-                    phone
-                    email
-                    totalPeople
-                    date
-                    time 
+                reservationMutation{
+                    updateReservation(id: $id, reservation :$reservation){
+                        id
+                        name
+                        phone
+                        email
+                        totalPeople
+                        date
+                        time
+                    }
                 }
             }",
             Variables = new { id = id, reservation = reservation }
@@ -301,17 +345,21 @@ public class GraphQLClient
         return response.Data.updateReservation;
     }
 
-    public async Task<string> DeleteReservation(int id)
+    public async Task<Reservation> DeleteReservation(int id)
     {
         var request = new GraphQLHttpRequest
         {
             Query = @"
             mutation($id : Int){
-                removeReservation(id : $id)
+                reservationMutation{
+                    removeReservation(id : $id){
+                        id
+                    }
+                }
             }",
             Variables = new { id = id }
         };
-        var response = await _client.SendMutationAsync(request, () => new { removeReservation = "" });
+        var response = await _client.SendMutationAsync(request, () => new { removeReservation = new Reservation() });
         return response.Data.removeReservation;
     }
     #endregion

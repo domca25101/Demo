@@ -6,8 +6,9 @@ using CoffeeShop.API.GraphQL;
 using GraphQL.Types;
 using GraphQL.Server;
 using CoffeeShop.API.GraphQL.Types;
-using GraphiQl;
-using CoffeeShop.API.GraphQL.Subscribing;
+using CoffeeShop.API.GraphQL.Queries;
+using CoffeeShop.API.GraphQL.Mutations;
+using CoffeeShop.API.GraphQL.Subscriptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +19,9 @@ builder.Services.AddScoped<IMenuRepository, MenuRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 
-builder.Services.AddSingleton<SubscriptionService>();
+builder.Services.AddSingleton<MenuSubscriptionService>();
+builder.Services.AddSingleton<ProductSubscriptionService>();
+builder.Services.AddSingleton<ReservationSubscriptionService>();
 
 builder.Services.AddScoped<IServiceProvider>(s => new FuncServiceProvider(s.GetRequiredService));
 builder.Services.AddScoped<MenuType>();
@@ -27,12 +30,29 @@ builder.Services.AddScoped<ReservationType>();
 builder.Services.AddScoped<MenuInputType>();
 builder.Services.AddScoped<ProductInputType>();
 builder.Services.AddScoped<ReservationInputType>();
+builder.Services.AddScoped<MenuQuery>();
+builder.Services.AddScoped<ProductQuery>();
+builder.Services.AddScoped<ReservationQuery>();
 builder.Services.AddScoped<Query>();
+builder.Services.AddScoped<MenuMutation>();
+builder.Services.AddScoped<ProductMutation>();
+builder.Services.AddScoped<ReservationMutation>();
 builder.Services.AddScoped<Mutation>();
 builder.Services.AddScoped<Subscription>();
 builder.Services.AddScoped<ISchema, CoffeeShopSchema>();
 
-builder.Services.AddGraphQL().AddSystemTextJson().AddWebSockets();
+builder.Services.AddCors();
+builder.Services.AddGraphQL(options =>
+                {
+                    options.EnableMetrics = true;
+                    options.UnhandledExceptionDelegate = ctx =>
+                    {
+                        Console.WriteLine("error: " + ctx.OriginalException.Message);
+                    };
+                })
+                .AddWebSockets()
+                .AddGraphTypes(typeof(CoffeeShopSchema))
+                .AddSystemTextJson();
 
 
 
@@ -46,8 +66,8 @@ app.UseEndpoints(endpoints =>
 });
 
 // app.UseGraphQLVoyager(new VoyagerOptions(){GraphQLEndPoint = "/graphql"}, "/graphql-voyager");
-app.UseWebSockets();
-app.UseGraphiQl("/graphql");
+app.UseWebSockets(); 
+app.UseGraphQLPlayground();
 app.UseGraphQL<ISchema>();
 app.UseGraphQLWebSockets<ISchema>("/graphql");
 app.Run();

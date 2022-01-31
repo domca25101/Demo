@@ -30,12 +30,12 @@ public class MenuRepository : IMenuRepository
         return await _dbContext.Menus.ToListAsync();
     }
 
-    public async Task<string> RemoveMenu(int id)
+    public async Task<Menu> RemoveMenu(int id)
     {
         var menuObj = await GetMenuById(id);
         _dbContext.Menus.Remove(menuObj);
         await _dbContext.SaveChangesAsync();
-        return $"Menu with ID {id} was deleted!";
+        return menuObj;
     }
 
     public async Task<Menu> UpdateMenu(int id, Menu menu)

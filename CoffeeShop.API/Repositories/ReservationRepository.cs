@@ -31,12 +31,12 @@ public class ReservationRepository : IReservationRepository
         return await _dbContext.Reservations.ToListAsync();
     }
 
-    public async Task<string> RemoveReservation(int id)
+    public async Task<Reservation> RemoveReservation(int id)
     {
         var reservationObj = await GetReservationById(id);
         _dbContext.Reservations.Remove(reservationObj);
         await _dbContext.SaveChangesAsync();
-        return $"Reservation with ID {id} was deleted!";
+        return reservationObj;
     }
 
     public async Task<Reservation> UpdateReservation(int id, Reservation reservation)

@@ -8,5 +8,5 @@ public interface IMenuRepository
     Task<Menu> GetMenuById(int id);
     Task<Menu> AddMenu(Menu menu);
     Task<Menu> UpdateMenu(int id, Menu menu);
-    Task<string> RemoveMenu(int id);
+    Task<Menu> RemoveMenu(int id);
 }

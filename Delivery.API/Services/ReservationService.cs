@@ -32,6 +32,6 @@ public class ReservationService
     public async Task RemoveAsync(int id) =>
         await _reservationCollection.DeleteOneAsync(x => x.Id == id);
 
-    public bool ReservationExist(int id) =>
-        _reservationCollection.Find(x => x.Id == id).FirstOrDefault() != null ? true : false;
+    public async Task<bool> ReservationExist(int id) =>
+        await _reservationCollection.Find(x => x.Id == id).AnyAsync();
 }

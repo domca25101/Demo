@@ -32,6 +32,6 @@ public class MenuService
     public async Task RemoveAsync(int id) =>
         await _menuCollection.DeleteOneAsync(x => x.Id == id);
 
-    public bool MenuExist(int id) =>
-        _menuCollection.Find(x => x.Id == id).FirstOrDefault() != null ? true : false;
+    public async Task<bool> MenuExist(int id) =>
+        await _menuCollection.Find(x => x.Id == id).AnyAsync();
 }

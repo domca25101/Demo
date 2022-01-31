@@ -30,12 +30,12 @@ public class ProductRepository : IProductRepository
         return await _dbContext.Products.Where(p => p.MenuId == menuId).ToListAsync();
     }
 
-    public async Task<string> RemoveProduct(int id)
+    public async Task<Product> RemoveProduct(int id)
     {
         var productObj = await _dbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
         _dbContext.Products.Remove(productObj);
         await _dbContext.SaveChangesAsync();
-        return $"Product with ID {id} was deleted!";
+        return productObj;
     }
 
     public async Task<Product> UpdateProduct(int id, Product product)

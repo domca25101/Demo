@@ -71,7 +71,7 @@ public class EventProcessor : IEventProcessor
                 try
                 {
                     var menuRepo = scope.ServiceProvider.GetRequiredService<MenuService>();
-                    if (menuRepo.MenuExist(message.Id))
+                    if (await menuRepo.MenuExist(message.Id))
                     {
                         Console.WriteLine("--> Menu already exists!");
                         return;
@@ -89,7 +89,7 @@ public class EventProcessor : IEventProcessor
                 try
                 {
                     var productRepo = scope.ServiceProvider.GetRequiredService<ProductService>();
-                    if (productRepo.ProductExist(message.Id))
+                    if (await productRepo.ProductExist(message.Id))
                     {
                         Console.WriteLine("--> Product already exists!");
                         return;
@@ -107,7 +107,7 @@ public class EventProcessor : IEventProcessor
                 try
                 {
                     var reservationRepo = scope.ServiceProvider.GetRequiredService<ReservationService>();
-                    if (reservationRepo.ReservationExist(message.Id))
+                    if (await reservationRepo.ReservationExist(message.Id))
                     {
                         Console.WriteLine("--> Reservation already exists!");
                         return;
