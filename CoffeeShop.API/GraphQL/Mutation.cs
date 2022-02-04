@@ -38,7 +38,7 @@ public class Mutation : ObjectGraphType
                 return menuService.MenuUpdated(await menuRepository.UpdateMenu(id, menu));
             }
         );
-        FieldAsync<MenuType>(
+        FieldAsync<IdType>(
             "removeMenu",
             arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "id" }),
             resolve: async context =>
@@ -72,7 +72,7 @@ public class Mutation : ObjectGraphType
                 return productService.ProductUpdated(await productRepository.UpdateProduct(id, product));
             }
         );
-        FieldAsync<ProductType>(
+        FieldAsync<IdType>(
             "removeProduct",
             arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "id" }),
             resolve: async context =>
@@ -106,7 +106,7 @@ public class Mutation : ObjectGraphType
                 return reservationService.ReservationUpdated(await reservationRepository.UpdateReservation(id, reservation));
             }
         );
-        FieldAsync<ReservationType>(
+        FieldAsync<IdType>(
             "removeReservation",
             arguments: new QueryArguments(new QueryArgument<IntGraphType> { Name = "id" }),
             resolve: async context =>

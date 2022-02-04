@@ -9,13 +9,11 @@ namespace CoffeeShop.Client.Controllers;
 [ApiController]
 public class ProductController : ControllerBase
 {
-    private readonly GraphQLClient _client;
-    private readonly IMessagePublisher _publisher;
+    private readonly ProductGQLClient _client;
 
-    public ProductController(GraphQLClient client, IMessagePublisher publisher)
+    public ProductController(ProductGQLClient client)
     {
         _client = client;
-        _publisher = publisher;
     }
 
     [HttpGet]

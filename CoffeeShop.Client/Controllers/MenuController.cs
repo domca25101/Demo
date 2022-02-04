@@ -9,13 +9,11 @@ namespace CoffeeShop.Client.Controllers;
 [ApiController]
 public class MenuController : ControllerBase
 {
-    private readonly GraphQLClient _client;
-    private readonly IMessagePublisher _publisher;
+    private readonly MenuGQLClient _client;
 
-    public MenuController(GraphQLClient client, IMessagePublisher publisher)
+    public MenuController(MenuGQLClient client)
     {
         _client = client;
-        _publisher = publisher;
     }
 
     [HttpGet]

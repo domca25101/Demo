@@ -1,5 +1,6 @@
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using CoffeeShop.API.GraphQL.Types;
 using CoffeeShop.API.Models;
 
 namespace CoffeeShop.API.GraphQL.Subscriptions;
@@ -8,7 +9,7 @@ public class MenuSubscriptionService
 {
     private readonly ISubject<Menu> _addMenuStream = new Subject<Menu>();
     private readonly ISubject<Menu> _updateMenuStream = new Subject<Menu>();
-    private readonly ISubject<Menu> _removeMenuStream = new Subject<Menu>();
+    private readonly ISubject<IdModel> _removeMenuStream = new Subject<IdModel>();
 
     public Menu MenuAdded(Menu menu)
     {
@@ -22,10 +23,10 @@ public class MenuSubscriptionService
         return menu;
     }
 
-    public Menu MenuDeleted(Menu menu)
+    public IdModel MenuDeleted(IdModel id)
     {
-        _removeMenuStream.OnNext(menu);
-        return menu;
+        _removeMenuStream.OnNext(id);
+        return id;
     }
 
     public IObservable<Menu> GetAddedMenu()
@@ -38,7 +39,7 @@ public class MenuSubscriptionService
         return _updateMenuStream.AsObservable();
     }
 
-    public IObservable<Menu> GetRemovedMenu()
+    public IObservable<IdModel> GetRemovedMenu()
     {
         return _removeMenuStream.AsObservable();
     }

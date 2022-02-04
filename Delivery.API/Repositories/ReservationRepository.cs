@@ -2,12 +2,12 @@ using Delivery.API.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
-namespace Delivery.API.Services;
+namespace Delivery.API.Repositories;
 
-public class ReservationService
+public class ReservationRepository
 {
     private readonly IMongoCollection<Reservation> _reservationCollection;
-    public ReservationService(IOptions<DatabaseSettings> dbSettings)
+    public ReservationRepository(IOptions<DatabaseSettings> dbSettings)
     {
         var mongoClient = new MongoClient(
             dbSettings.Value.ConnectionString);

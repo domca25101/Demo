@@ -9,13 +9,11 @@ namespace CoffeeShop.Client.Controllers;
 [ApiController]
 public class ReservationController : ControllerBase
 {
-    private readonly GraphQLClient _client;
-    private readonly IMessagePublisher _publisher;
+    private readonly ReservationGQLClient _client;
 
-    public ReservationController(GraphQLClient client, IMessagePublisher publisher)
+    public ReservationController(ReservationGQLClient client)
     {
         _client = client;
-        _publisher = publisher;
     }
 
     [HttpGet]

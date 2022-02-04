@@ -5,8 +5,39 @@ using EasyNetQ;
 using GraphQL.Client.Abstractions;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.Newtonsoft;
+using Serilog;
+using Serilog.Sinks.Elasticsearch;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var elasticUri = builder.Configuration["ElasticSearch:Url"];
+var elasticIndex = builder.Configuration["ElasticSearch:Log_Index"];
+
+builder.Host.UseSerilog();
+
+Log.Logger = new LoggerConfiguration()
+    .Filter.ByExcluding(c => c.Properties.Any(p => p.Value.ToString().ToLower().Contains("unhealty")))
+    .Filter.ByExcluding(c => c.Properties.Any(p => p.Value.ToString().ToLower().Contains("healty")))
+    .Filter.ByExcluding(c => c.Properties.Any(p => p.Value.ToString().ToLower().Contains("degrade")))
+    .Filter.ByExcluding(c => c.MessageTemplate.Text.ToLower().Contains("health check"))
+    .Filter.ByExcluding(c => c.MessageTemplate.Text.ToLower().Contains("hosting"))
+    .Filter.ByExcluding(c => c.MessageTemplate.Text.ToLower().Contains("content"))
+    .Filter.ByExcluding(c => c.MessageTemplate.Text.ToLower().Contains("{address}")) 
+    .Filter.ByExcluding(c => c.MessageTemplate.Text.ToLower().Contains("ctrl+c"))
+    .Filter.ByExcluding(c => c.MessageTemplate.Text.ToLower().Contains("{version}"))
+    .Filter.ByExcluding(c => c.MessageTemplate.Text.Contains("Exec"))
+    .WriteTo.Console()
+    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(elasticUri))
+    {
+        RegisterTemplateFailure = RegisterTemplateRecovery.FailSink,
+        AutoRegisterTemplate = true,
+        AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7,
+        
+        IndexDecider = (e, o) =>
+        {
+            return $"{elasticIndex.ToLower()}-{DateTime.UtcNow:yyyy-MM-dd}";
+        },
+    }).CreateLogger();
 
 // Add services to the container.
 
@@ -22,7 +53,9 @@ builder.Services.AddSingleton(bus);
 builder.Services.AddSingleton<IMessagePublisher, MessagePublisher>();
 
 builder.Services.AddSingleton<IGraphQLClient>(p => new GraphQLHttpClient(builder.Configuration.GetConnectionString("CoffeeShopApi"), new NewtonsoftJsonSerializer()));
-builder.Services.AddSingleton<GraphQLClient>();
+builder.Services.AddSingleton<MenuGQLClient>();
+builder.Services.AddSingleton<ProductGQLClient>();
+builder.Services.AddSingleton<ReservationGQLClient>();
 builder.Services.AddSingleton<SubscriptionHandler>();
 
 var app = builder.Build();
@@ -40,8 +73,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-var subscriptionHandler = app.Services.GetService<SubscriptionHandler>().SubscribeAll();
+using var subscriptionHandler = app.Services.GetService<SubscriptionHandler>().SubscribeAll();
 
 app.Run();
-
-subscriptionHandler.Dispose();

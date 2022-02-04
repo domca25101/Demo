@@ -9,28 +9,29 @@ public class SubscriptionHandler : IDisposable
 {
     private readonly IGraphQLClient _client;
     private readonly IMessagePublisher _publisher;
-
+    private readonly ILogger<SubscriptionHandler> _logger;
     private readonly List<IDisposable> subscriptions = new List<IDisposable>();
 
-    public SubscriptionHandler(IGraphQLClient client, IMessagePublisher publisher)
+    public SubscriptionHandler(IGraphQLClient client, IMessagePublisher publisher, ILogger<SubscriptionHandler> logger)
     {
         _client = client;
         _publisher = publisher;
+        _logger = logger;
     }
 
     public SubscriptionHandler SubscribeAll()
     {
-        subscriptions.Add(GQLSubscription.AddMenuSubscription(_client, _publisher));
-        subscriptions.Add(GQLSubscription.UpdateMenuSubscription(_client, _publisher));
-        subscriptions.Add(GQLSubscription.RemoveMenuSubscription(_client, _publisher));
+        subscriptions.Add(MenuGQLSubscription.AddMenuSubscription(_client, _publisher, _logger));
+        subscriptions.Add(MenuGQLSubscription.UpdateMenuSubscription(_client, _publisher, _logger));
+        subscriptions.Add(MenuGQLSubscription.RemoveMenuSubscription(_client, _publisher, _logger));
 
-        subscriptions.Add(GQLSubscription.AddProductSubscription(_client, _publisher));
-        subscriptions.Add(GQLSubscription.UpdateProductSubscription(_client, _publisher));
-        subscriptions.Add(GQLSubscription.RemoveProductSubscription(_client, _publisher));
+        subscriptions.Add(ProductGQLSubscription.AddProductSubscription(_client, _publisher, _logger));
+        subscriptions.Add(ProductGQLSubscription.UpdateProductSubscription(_client, _publisher, _logger));
+        subscriptions.Add(ProductGQLSubscription.RemoveProductSubscription(_client, _publisher, _logger));
 
-        subscriptions.Add(GQLSubscription.AddReservationSubscription(_client, _publisher));
-        subscriptions.Add(GQLSubscription.UpdateReservationSubscription(_client, _publisher));
-        subscriptions.Add(GQLSubscription.RemoveReservationSubscription(_client, _publisher));
+        subscriptions.Add(ReservationGQLSubscription.AddReservationSubscription(_client, _publisher, _logger));
+        subscriptions.Add(ReservationGQLSubscription.UpdateReservationSubscription(_client, _publisher, _logger));
+        subscriptions.Add(ReservationGQLSubscription.RemoveReservationSubscription(_client, _publisher, _logger));
 
         return this;
     }

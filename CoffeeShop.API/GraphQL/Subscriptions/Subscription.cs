@@ -31,9 +31,9 @@ public class Subscription : ObjectGraphType
         AddField(new EventStreamFieldType
         {
             Name = "menuRemoved",
-            Type = typeof(MenuType),
-            Resolver = new FuncFieldResolver<Menu>( c => c.Source as Menu),
-            Subscriber = new EventStreamResolver<Menu>(c => menuService.GetRemovedMenu())
+            Type = typeof(IdType),
+            Resolver = new FuncFieldResolver<IdModel>( c => c.Source as IdModel),
+            Subscriber = new EventStreamResolver<IdModel>(c => menuService.GetRemovedMenu())
         });
 
         AddField(new EventStreamFieldType
@@ -55,9 +55,9 @@ public class Subscription : ObjectGraphType
         AddField( new EventStreamFieldType
         {
             Name = "productRemoved",
-            Type = typeof(ProductType),
-            Resolver = new FuncFieldResolver<Product>(c => c.Source as Product),
-            Subscriber = new EventStreamResolver<Product>( c => productService.GetRemovedProduct())
+            Type = typeof(IdType),
+            Resolver = new FuncFieldResolver<IdModel>(c => c.Source as IdModel),
+            Subscriber = new EventStreamResolver<IdModel>( c => productService.GetRemovedProduct())
         });
 
         AddField(new EventStreamFieldType
@@ -79,9 +79,9 @@ public class Subscription : ObjectGraphType
         AddField( new EventStreamFieldType
         {
             Name = "reservationRemoved",
-            Type = typeof(ReservationType),
-            Resolver = new FuncFieldResolver<Reservation>(c => c.Source as Reservation),
-            Subscriber = new EventStreamResolver<Reservation>( c => reservationService.GetRemovedReservation())
+            Type = typeof(IdType),
+            Resolver = new FuncFieldResolver<IdModel>(c => c.Source as IdModel),
+            Subscriber = new EventStreamResolver<IdModel>( c => reservationService.GetRemovedReservation())
         });
     }
 }

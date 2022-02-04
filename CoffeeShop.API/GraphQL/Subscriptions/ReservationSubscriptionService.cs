@@ -1,5 +1,6 @@
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using CoffeeShop.API.GraphQL.Types;
 using CoffeeShop.API.Models;
 
 namespace CoffeeShop.API.GraphQL.Subscriptions;
@@ -8,7 +9,7 @@ public class ReservationSubscriptionService
 {
     private readonly ISubject<Reservation> _addReservationStream = new Subject<Reservation>();
     private readonly ISubject<Reservation> _updateReservationStream = new Subject<Reservation>();
-    private readonly ISubject<Reservation> _removeReservationStream = new ReplaySubject<Reservation>();
+    private readonly ISubject<IdModel> _removeReservationStream = new Subject<IdModel>();
 
     public Reservation ReservationAdded(Reservation reservation)
     {
@@ -22,10 +23,10 @@ public class ReservationSubscriptionService
         return reservation;
     }
 
-    public Reservation ReservationDeleted(Reservation reservation)
+    public IdModel ReservationDeleted(IdModel id)
     {
-        _removeReservationStream.OnNext(reservation);
-        return reservation;
+        _removeReservationStream.OnNext(id);
+        return id;
     }
 
     public IObservable<Reservation> GetAddedReservation()
@@ -38,7 +39,7 @@ public class ReservationSubscriptionService
         return _updateReservationStream.AsObservable();
     }
 
-    public IObservable<Reservation> GetRemovedReservation()
+    public IObservable<IdModel> GetRemovedReservation()
     {
         return _removeReservationStream.AsObservable();
     }

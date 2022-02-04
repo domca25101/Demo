@@ -7,8 +7,41 @@ using GraphQL.Types;
 using GraphQL.Server;
 using CoffeeShop.API.GraphQL.Types;
 using CoffeeShop.API.GraphQL.Subscriptions;
+using Serilog;
+using Serilog.Sinks.Elasticsearch;
+using Serilog.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var elasticUri = builder.Configuration["ElasticSearch:Url"];
+var elasticIndex = builder.Configuration["ElasticSearch:Log_Index"];
+
+builder.Host.UseSerilog();
+
+Log.Logger = new LoggerConfiguration()
+    .Filter.ByExcluding(c => c.Properties.Any(p => p.Value.ToString().ToLower().Contains("unhealty")))
+    .Filter.ByExcluding(c => c.Properties.Any(p => p.Value.ToString().ToLower().Contains("healty")))
+    .Filter.ByExcluding(c => c.Properties.Any(p => p.Value.ToString().ToLower().Contains("degrade")))
+    .Filter.ByExcluding(c => c.MessageTemplate.Text.ToLower().Contains("health check"))
+    .Filter.ByExcluding(c => c.MessageTemplate.Text.ToLower().Contains("hosting"))
+    .Filter.ByExcluding(c => c.MessageTemplate.Text.ToLower().Contains("content"))
+    .Filter.ByExcluding(c => c.MessageTemplate.Text.ToLower().Contains("{address}")) 
+    .Filter.ByExcluding(c => c.MessageTemplate.Text.ToLower().Contains("ctrl+c"))
+    .Filter.ByExcluding(c => c.MessageTemplate.Text.ToLower().Contains("dbcommand"))
+    .Filter.ByExcluding(c => c.MessageTemplate.Text.ToLower().Contains("{version}"))
+    .WriteTo.Console()
+    .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(new Uri(elasticUri))
+    {
+        RegisterTemplateFailure = RegisterTemplateRecovery.FailSink,
+        AutoRegisterTemplate = true,
+        AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7,
+        
+        IndexDecider = (e, o) =>
+        {
+            return $"{elasticIndex.ToLower()}-{DateTime.UtcNow:yyyy-MM-dd}";
+        },
+    }).CreateLogger();
+
 
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer
 (builder.Configuration.GetConnectionString("DbConnection")));
@@ -57,8 +90,9 @@ app.UseEndpoints(endpoints =>
     // endpoints.MapGraphQL();
 });
 
+
 // app.UseGraphQLVoyager(new VoyagerOptions(){GraphQLEndPoint = "/graphql"}, "/graphql-voyager");
-app.UseWebSockets(); 
+app.UseWebSockets();
 app.UseGraphQLPlayground();
 app.UseGraphQL<ISchema>();
 app.UseGraphQLWebSockets<ISchema>("/graphql");

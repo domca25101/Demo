@@ -15,6 +15,52 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
+
+  elasticsearch:
+    container_name: elasticsearch 
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.5.0
+    environment:
+      - discovery.type=single-node
+      - node.name=elasticsearch
+#      - cluster.name=docker-cluster
+#      - cluster.initial_master_nodes=elasticsearch1
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms256M -Xmx256M"
+      - http.cors.enabled=true
+      - http.cors.allow-origin=*
+      - network.host=_eth0_
+    ulimits:
+      nproc: 65535
+      memlock:
+        soft: -1
+        hard: -1
+    cap_add:
+      - ALL
+    volumes:
+      - log1:/var/log"
+      - data1:/usr/share/elasticsearch/data"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.5.0
+    container_name: CoffeeShop-kibana
+    environment:
+      SERVER_NAME: localhost
+      ELASTICSEARCH_URL: http://elasticsearch:9200/
+    ports:
+      - 5601:5601
+    volumes:
+      - "./kib/log:/var/log"
+    ulimits:
+      nproc: 65535
+      memlock:
+        soft: -1
+        hard: -1
+    cap_add:
+      - ALL
    
       
   mongodb:
@@ -37,3 +83,6 @@ networks:
  
 volumes:
   rabbitmq-01-data: 
+  log1:
+  data1:
+  

@@ -2,13 +2,13 @@ using Delivery.API.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
-namespace Delivery.API.Services;
+namespace Delivery.API.Repositories;
 
-public class ProductService
+public class ProductRepository
 {
     private readonly IMongoCollection<Product> _productCollection;
 
-    public ProductService(IOptions<DatabaseSettings> dbSettings)
+    public ProductRepository(IOptions<DatabaseSettings> dbSettings)
     {
         var mongoClient = new MongoClient(
             dbSettings.Value.ConnectionString);
